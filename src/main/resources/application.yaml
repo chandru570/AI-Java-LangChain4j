@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: AI-Java-LangChain4j
+langchain4j:
+  google-ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY}
