@@ -1,6 +1,11 @@
 spring:
   application:
     name: AI-Java-LangChain4j
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 langchain4j:
   google-ai:
     gemini:

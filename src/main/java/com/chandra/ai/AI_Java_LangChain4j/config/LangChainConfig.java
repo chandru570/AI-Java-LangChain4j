@@ -4,6 +4,7 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +26,12 @@ public class LangChainConfig {
     }
 
     @Bean
-    public ChatMemoryProvider chatMemoryProvider() {
+    public ChatMemoryProvider chatMemoryProvider(ChatMemoryStore redisStore) {
         // This provider will create a new memory 'window' for every unique @MemoryId
         return memoryId -> MessageWindowChatMemory.builder()
                 .maxMessages(10)
                 .id(memoryId)
+                .chatMemoryStore(redisStore)
                 .build();
     }
 }
