@@ -9,8 +9,11 @@ spring:
 langchain4j:
   google-ai:
     gemini:
-      api-key: ${GEMINI_API_KEY}
+      api-key: test-key-gemini
   anthropic:
-    api-key: ${ANTHROPIC_API_KEY}
+    api-key: sk-ant-v3-test-key-123456789
     chat-model:
-      model-name: claude-opus-4-1
+      model-name: claude-3-5-sonnet-20241022
+
+
+

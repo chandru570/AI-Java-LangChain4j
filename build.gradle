@@ -31,6 +31,7 @@ dependencies {
     implementation 'dev.langchain4j:langchain4j-core:1.10.0'
     implementation "dev.langchain4j:langchain4j-spring-boot-starter"
     implementation 'dev.langchain4j:langchain4j-google-ai-gemini-spring-boot-starter:1.10.0-beta18'
+    implementation 'dev.langchain4j:langchain4j-anthropic:1.10.0'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

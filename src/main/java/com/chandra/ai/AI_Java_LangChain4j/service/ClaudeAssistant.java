@@ -4,8 +4,12 @@ import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 
-public interface SupportAssistant {
+public interface ClaudeAssistant {
 
     @SystemMessage("You are a helpful assistant for a Java-based cloud platform.")
     String chat(@MemoryId String userId, @UserMessage String userMessage);
 }
+
+
+
+
