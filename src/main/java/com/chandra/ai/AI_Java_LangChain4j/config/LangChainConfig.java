@@ -25,14 +25,26 @@ public class LangChainConfig {
     @Value("${langchain4j.anthropic.api-key:}")
     private String anthropicApiKey;
 
+    @Value("${langchain4j.log.requests:false}")
+    private boolean logRequests;
+
+    @Value("${langchain4j.log.responses:false}")
+    private boolean logResponses;
+
+    @Value("${langchain4j.google-ai.gemini.model-name:gemini-2.5-flash}")
+    private String geminiModelName;
+
+    @Value("${langchain4j.anthropic.model-name:claude-opus-4-1}")
+    private String anthropicModelName;
+
     @Bean("gemimiChatModel")
     @Primary
     public ChatModel gemimiChatModel() {
         return GoogleAiGeminiChatModel.builder()
                 .apiKey(geminiApiKey)
-                .modelName("gemini-2.5-flash")
-                .logRequests(true)
-                .logResponses(true)
+                .modelName(geminiModelName)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 
@@ -41,9 +53,9 @@ public class LangChainConfig {
     public ChatModel claudeChatModel() {
         return AnthropicChatModel.builder()
                 .apiKey(anthropicApiKey)
-                .modelName("claude-opus-4-1")
-                .logRequests(true)
-                .logResponses(true)
+                .modelName(anthropicModelName)
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 
