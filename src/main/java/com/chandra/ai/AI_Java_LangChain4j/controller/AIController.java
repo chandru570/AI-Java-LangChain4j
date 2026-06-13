@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -19,6 +23,8 @@ public class AIController {
 
     @Value("${langchain4j.anthropic.api-key:}")
     private String anthropicApiKey;
+
+    private static final Logger logger = LoggerFactory.getLogger(AIController.class);
 
     public AIController(SupportAssistant assistant, @Autowired(required = false) ClaudeAssistant claudeAssistant) {
         this.assistant = assistant;
@@ -36,9 +42,10 @@ public class AIController {
             try {
                 return claudeAssistant.get().chat(userId, message);
             } catch (Exception e) {
-                return "Error calling Claude: " + e.getMessage() +
-                       "\nAPI Key configured: " + (anthropicApiKey != null && !anthropicApiKey.isEmpty()) +
-                       "\nPlease verify your ANTHROPIC_API_KEY is set correctly and the model is available.";
+                // Log full exception with stacktrace for server-side diagnostics
+                logger.error("Error calling Claude assistant for user {}: {}", userId, e.getMessage(), e);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Error calling Claude service. Please contact support.");
             }
         }
         return "Claude assistant is not configured. Please set ANTHROPIC_API_KEY environment variable.";
@@ -51,9 +58,6 @@ public class AIController {
         status.append("- Gemini Assistant: ").append("Available\n");
         status.append("- Claude Assistant: ").append(claudeAssistant.isPresent() ? "Available" : "Not Available").append("\n");
         status.append("- ANTHROPIC_API_KEY configured: ").append(anthropicApiKey != null && !anthropicApiKey.isEmpty()).append("\n");
-        if (anthropicApiKey != null && !anthropicApiKey.isEmpty()) {
-            status.append("- API Key prefix: ").append(anthropicApiKey.substring(0, Math.min(10, anthropicApiKey.length()))).append("...\n");
-        }
         return status.toString();
     }
 }

@@ -6,6 +6,10 @@ import dev.langchain4j.data.message.ChatMessageSerializer;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -19,19 +23,30 @@ public class RedisChatMemoryStore implements ChatMemoryStore {
         this.redisTemplate = redisTemplate;
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(RedisChatMemoryStore.class);
+
+    @Value("${chat.memory.ttl.seconds:604800}")
+    private long chatMemoryTtlSeconds;
+
     @Override
     public List<ChatMessage> getMessages(Object memoryId) {
         String key = "chat:" + memoryId;
         String json = redisTemplate.opsForValue().get(key);
 
-        return (json != null) ? ChatMessageDeserializer.messagesFromJson(json) : new java.util.ArrayList<>();
+        try {
+            return (json != null) ? ChatMessageDeserializer.messagesFromJson(json) : new java.util.ArrayList<>();
+        } catch (Exception e) {
+            logger.error("Failed to deserialize chat messages for key {}: {}", key, e.getMessage(), e);
+            return new java.util.ArrayList<>();
+        }
     }
 
     @Override
     public void updateMessages(Object memoryId, List<ChatMessage> messages) {
         String key = "chat:" + memoryId;
         String json = ChatMessageSerializer.messagesToJson(messages);
-        redisTemplate.opsForValue().set(key, json);
+        // Store with TTL to avoid indefinite growth (configurable)
+        redisTemplate.opsForValue().set(key, json, Duration.ofSeconds(chatMemoryTtlSeconds));
     }
 
     @Override
